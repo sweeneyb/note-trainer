@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Piano Note Trainer</title>
+  <!-- <script src="https://unpkg.com/vexflow/releases/vexflow-min.js"></script> -->
+  <!-- <script src="https://unpkg.com/vexflow/releases/vexflow-debug.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+  
+  <script defer src="app.js"></script>
+  <style>
+    canvas { display: block; margin: 20px auto; }
+    body { text-align: center; font-family: Arial; background: #f4f4f4; }
+    button { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Piano Note Trainer</h1>
+  <div id="staff"></div>
+  <button onclick="startListening()">Start Listening</button><button onclick="stopListening()">Stop Listening</button>
+  <p id="result"></p>
+</body>
+</html>
