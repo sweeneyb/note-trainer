@@ -60,10 +60,14 @@ function noteToFrequency(note) {
 function frequencyToNote(freq) {
   const A4 = 440;
   const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  const n = Math.round(12 * Math.log2(freq / A4));
+  n = Math.round(12 * Math.log2(freq / A4));
+  if (n < 0) {
+    n = 12 - (n % 12)
+  }
   const index = (n + 9 + 12) % 12;
   const octave = 4 + Math.floor((n + 9) / 12);
-  return notes[index] + octave;
+  console.log("", n, index, octave)
+  return notes[index] + " in " + octave;
 }
 
 async function stopListening() {
@@ -128,10 +132,10 @@ async function startListening() {
     for (let i = 0; i < size; i++) rms += buf[i] * buf[i];
     rms = Math.sqrt(rms / size);
     console.log("rms",rms)
-    // if (rms < 0.01) {
-    //     console.log("too quiet")
-    //     return -1; // too quiet
-    // }
+    if (rms < 0.15) {
+        console.log("too quiet")
+        return -1; // too quiet
+    }
 
     let lastCorrelation = 1;
     for (let offset = 8; offset < size / 2; offset++) {
