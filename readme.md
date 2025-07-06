@@ -5,6 +5,5 @@ A simple page to help note recognition.  It displays a note and listens for that
 Just open the index.html page.  There's no framework, everything runs in-browser for now.
 
 ## Future work
-* Auto-progress to the next note when a match/mismatch is detected.
+* make the positive validation stay on the page for a few seconds before moving on
 * chord support (for piano)
-* 

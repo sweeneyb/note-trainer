@@ -6,6 +6,7 @@
   <!-- <script src="https://unpkg.com/vexflow/releases/vexflow-min.js"></script> -->
   <!-- <script src="https://unpkg.com/vexflow/releases/vexflow-debug.js"></script> -->
   <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+  <script src="https://unpkg.com/aubiojs"></script>
   
   <script defer src="app.js"></script>
   <style>
@@ -17,8 +18,9 @@
 <body>
   <h1>Piano Note Trainer</h1>
   <div id="staff"></div>
-  <button onclick="startListening()">Start Listening</button><button onclick="stopListening()">Stop Listening</button>
+  <button onclick="startListening()">Start Listening</button><button onclick="stopListening()">Stop Listening</button><button onclick="nextNote()">next note</button>
   <p id="result"></p>
+  <p id="greenCheck"></p>
   <canvas id="oscilloscope" width="200" height="100"></canvas>
 </body>
 </html>
