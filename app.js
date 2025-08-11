@@ -19,16 +19,23 @@ function renderNote(note) {
     const { Renderer, Stave, StaveNote, Voice, Formatter, Accidental } = Vex.Flow;
 
     const renderer = new Renderer(div, Renderer.Backends.SVG);
-    renderer.resize(500, 200);
+    renderer.resize(500, 300);
     const context = renderer.getContext();
 
     const isBass = parseInt(note.slice(-1)) < 4;
-    const staveY = isBass ? 100 : 40;
+    const staveY = 40;
+    // const staveY = isBass ? 100 : 40;
 
-    const stave = new Stave(10, staveY, 400);
-    stave.addClef(isBass ? "bass" : "treble");
-    stave.setContext(context).draw();
+    const stave1 = new Stave(10, staveY, 400);
+    const stave2 = new Stave(10, staveY+60, 400);
+    // stave.addClef(isBass ? "bass" : "treble");
+    stave1.addClef('treble');
+    stave1.setContext(context).draw();
+    stave2.addClef('bass');
+    stave2.setContext(context).draw();
+    new Vex.Flow.StaveConnector(stave1, stave2).setContext(context).draw();
 
+    console.log(note)
     const keys = [note[0].toLowerCase() + "/" + note.slice(-1)];
     const staveNote = new StaveNote({
         clef: isBass ? "bass" : "treble",
@@ -47,7 +54,7 @@ function renderNote(note) {
     voice.addTickables([staveNote]);
 
     new Formatter().joinVoices([voice]).format([voice], 400);
-    voice.draw(context, stave);
+    voice.draw(context, isBass?stave2:stave1);
 }
 function noteToFrequency(note) {
     const A4 = 440;
