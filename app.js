@@ -35,7 +35,6 @@ function renderNote(note) {
     stave2.setContext(context).draw();
     new Vex.Flow.StaveConnector(stave1, stave2).setContext(context).draw();
 
-    console.log(note)
     const keys = [note[0].toLowerCase() + "/" + note.slice(-1)];
     const staveNote = new StaveNote({
         clef: isBass ? "bass" : "treble",
@@ -71,7 +70,7 @@ function frequencyToNote(freq) {
     n = Math.round(12 * Math.log2(freq / A4));
     const index = ( (n%12) + 9 + 12) % 12;
     const octave = 4 + Math.floor((n + 9) / 12);
-    console.log("offset, index, octave", n, index, octave)
+    // console.log("offset, index, octave", n, index, octave)
     return notes[index] + octave;
 }
 
@@ -86,14 +85,21 @@ const size = bufferSize / (1 << 10);
 
 let freq = -1
 
+let detectionOverride = false;
+
 async function stopListening() {
     continueListening = false;
     audioContext.suspend()
 }
 
 async function nextNote() {
+    detectionOverride = false
     targetNote = getRandomNote()
     renderNote(targetNote)
+}
+
+async function fire() {
+    detectionOverride = true
 }
 
 async function startListening() {
@@ -120,16 +126,16 @@ async function startListening() {
         const bufferSize = 1024;
 
         processor.addEventListener("audioprocess", function (event) {
-            console.log("event listener")
+            // console.log("event listener")
         })
         processor.onaudioprocess = function (e) {
-            console.log("processing pitch")
+            // console.log("processing pitch")
             const input = e.inputBuffer.getChannelData(0); // mono channel
 
             // aubio.js expects Float32Array
             const pitch = pitchDetector.do(input);
             if (pitch) {
-                console.log("Detected pitch:", pitch);
+                // console.log("Detected pitch:", pitch);
                 freq = pitch
             }
         }
@@ -181,23 +187,30 @@ async function startListening() {
     const detect = () => {
         draw()
         analyser.getFloatTimeDomainData(buffer);
-        console.log("freq: ", freq)
+        // console.log("freq: ", freq)
         if (freq !== -1) {
             const detectedNote = frequencyToNote(freq);
-            console.log("frequency is: ", freq, detectedNote)
+            // console.log("frequency is: ", freq, detectedNote)
             document.getElementById("result").textContent = `You played: ${detectedNote} (${Math.floor(freq)}) looking for ${targetNote} ${noteToFrequency(targetNote)}`;
-            if (detectedNote === targetNote) {
+            if (detectedNote === targetNote || detectionOverride) {
+                console.log("match!!!")
                 document.getElementById("greenCheck").textContent += " ✅ Correct!";
-                setTimeout(requestAnimationFrame(function() {
-                    nextNote();
+                setTimeout(function() {
                     document.getElementById("greenCheck").textContent = "";
-                }), 2000);
+                    nextNote();
+                    requestAnimationFrame(detect)
+                }, 2000)
+                // setTimeout(requestAnimationFrame(function() {
+                //     nextNote();
+                //     document.getElementById("greenCheck").textContent = "";
+                // }), 2000);
+            } else {
+                setTimeout(requestAnimationFrame(detect), 2000);
             }
-            setTimeout(requestAnimationFrame(detect), 2000);
         } else {
             console.log("frequency is -1")
             if (continueListening == true) {
-                requestAnimationFrame(detect);
+                setTimeout(requestAnimationFrame(detect), 2000);
             }
         }
 
