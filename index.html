@@ -17,6 +17,12 @@
 </head>
 <body>
   <h1>Piano Note Trainer</h1>
+  <label for="transposition">Instrument:</label>
+<select id="transposition">
+  <option value="0">Concert Pitch</option>
+  <option value="2">Trumpet (+2 semitones)</option>
+  <option value="7">French Horn (+7 semitones)</option>
+</select>
   <div id="staff"></div>
   <button onclick="startListening()">Start Listening</button><button onclick="stopListening()">Stop Listening</button><button onclick="nextNote()">next note</button><button onclick="fire()">fire</button>
   <p id="result"></p>

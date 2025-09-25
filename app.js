@@ -75,6 +75,24 @@ function frequencyToNote(freq) {
     return notes[index] + octave;
 }
 
+function transposeNote(note, semitones) {
+    const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    let base = note.slice(0, note.length - 1);
+    let octave = parseInt(note.slice(-1));
+    let idx = notes.indexOf(base);
+    if (idx === -1) {
+        // Handle flats
+        if (base.length === 2 && base[1] === "b") {
+            idx = notes.indexOf(base[0]) - 1;
+            if (idx < 0) idx += 12;
+        }
+    }
+    let newIdx = idx + semitones;
+    let newOctave = octave + Math.floor(newIdx / 12);
+    newIdx = ((newIdx % 12) + 12) % 12;
+    return notes[newIdx] + newOctave;
+}
+
 
 
 
@@ -185,37 +203,37 @@ async function startListening() {
         canvasCtx.stroke();
     }
 
-    const detect = () => {
-        draw()
-        analyser.getFloatTimeDomainData(buffer);
-        // console.log("freq: ", freq)
-        if (freq !== -1) {
-            const detectedNote = frequencyToNote(freq);
-            // console.log("frequency is: ", freq, detectedNote)
-            document.getElementById("result").textContent = `You played: ${detectedNote} (${Math.floor(freq)}) looking for ${targetNote} ${noteToFrequency(targetNote)}`;
-            if (detectedNote === targetNote || detectionOverride) {
-                console.log("match!!!")
-                document.getElementById("greenCheck").textContent += " ✅ Correct!";
-                setTimeout(function() {
-                    document.getElementById("greenCheck").textContent = "";
-                    nextNote();
-                    requestAnimationFrame(detect)
-                }, 1000)
-                // setTimeout(requestAnimationFrame(function() {
-                //     nextNote();
-                //     document.getElementById("greenCheck").textContent = "";
-                // }), 2000);
-            } else {
-                setTimeout(requestAnimationFrame(detect), 2000);
-            }
-        } else {
-            console.log("frequency is -1")
-            if (continueListening == true) {
-                setTimeout(requestAnimationFrame(detect), 2000);
-            }
+  const detect = () => {
+    draw()
+    analyser.getFloatTimeDomainData(buffer);
+    if (freq !== -1) {
+        let detectedNote = frequencyToNote(freq);
+
+        // Get transposition value from dropdown
+        const semitones = parseInt(document.getElementById("transposition").value, 10);
+        if (semitones !== 0) {
+            detectedNote = transposeNote(detectedNote, semitones);
         }
 
-    };
+        document.getElementById("result").textContent = `You played: ${detectedNote} (${Math.floor(freq)}) looking for ${targetNote} ${noteToFrequency(targetNote)}`;
+        if (detectedNote === targetNote || detectionOverride) {
+            console.log("match!!!")
+            document.getElementById("greenCheck").textContent += " ✅ Correct!";
+            setTimeout(function() {
+                document.getElementById("greenCheck").textContent = "";
+                nextNote();
+                requestAnimationFrame(detect)
+            }, 1000)
+        } else {
+            setTimeout(requestAnimationFrame(detect), 2000);
+        }
+    } else {
+        console.log("frequency is -1")
+        if (continueListening == true) {
+            setTimeout(requestAnimationFrame(detect), 2000);
+        }
+    }
+};
 
     detect();
 }
